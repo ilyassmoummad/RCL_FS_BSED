@@ -13,7 +13,7 @@ To create the spectrograms of the training set:\
 ```create_train.py```: with argument ```--traindir``` for the folder containing the training datasets
 
 ## Training
-To train the feature extractor :\
+To train the feature extractor:\
 ```train.py```: with arguments ```--traindir``` (the same as above)
 ```--method```: optional argument for the pretraining method ```scl``` for SupCon and ```ssl``` for SimCLR
 
