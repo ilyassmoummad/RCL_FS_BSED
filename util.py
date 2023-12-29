@@ -12,9 +12,9 @@ def get_distance(proto_pos,neg_proto,query_set_out):
 
 def finetune_proto(encoder, train_loader, transform,  args):
 
-    print(f"Training finetuning on {args.device}")
+    print(f"Finetuning on {args.device}")
     
-    loss_fn = ProtoCLR(args.tau)
+    loss_fn = ProtoCLR() # tau=1.0 by default
     
     non_trainable_parameters = []
     
@@ -33,8 +33,8 @@ def finetune_proto(encoder, train_loader, transform,  args):
     
     num_epochs = args.ftepochs
 
-    train_loss = []
-    best_loss = None
+    # train_loss = []
+    # best_loss = None
     encoder = encoder.to(args.device)
     encoder.train()
 
@@ -65,7 +65,7 @@ def finetune_proto(encoder, train_loader, transform,  args):
                 
         tr_loss = tr_loss/len(train_iterator)
         print('Average train loss: {}'.format(tr_loss))
-        if args.adam:
-            lr_scheduler.step()
+        # if args.adam:
+        #     lr_scheduler.step()
 
     return encoder

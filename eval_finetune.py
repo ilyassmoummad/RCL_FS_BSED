@@ -17,23 +17,28 @@ from args import args
 
 # General params
 val_dir = args.valdir
-out_dir = os.path.join(args.traindir, '../../outputs')
+out_dir = os.path.join(args.valdir, '../outputs')
 os.makedirs(out_dir, exist_ok=True)
 csv_path = os.path.join(out_dir, 'eval.csv')
-ckpt_dir = os.path.join(args.traindir, '../model/')
+ckpt_dir = os.path.join(args.valdir, '../model/')
 TARGET_SR = args.sr
 N_MELS = args.nmels
 HOP_MEL = args.hoplen
 N_SHOT = args.nshot
 BATCH_SIZE = args.qbs
-NUM_WORKERS = args.workers
 fps = TARGET_SR/HOP_MEL
+emb_dim = 2048 # dimension of the latent space, check architecture in models.py
 
 # Spectrogram
 mel = T.MelSpectrogram(sample_rate=args.sr, n_fft=args.nfft, hop_length=args.hoplen, f_min=args.fmin, f_max=args.fmax, n_mels=args.nmels)
 power_to_db = T.AmplitudeToDB()
 transform = nn.Sequential(mel, power_to_db)
 
+report = {}
+report['filename'] = []
+report['onset'] = []
+report['offset'] = []
+report['preds'] = []
 name_arr = np.array([])
 onset_arr = np.array([])
 offset_arr = np.array([])
@@ -68,7 +73,7 @@ for filename in filenames:
     else:
         win_len = max_len//8
     seg_hop = win_len//2
-    
+
     wav, sr = torchaudio.load(wav_file)
 
     resample = T.Resample(sr, TARGET_SR)
@@ -181,14 +186,14 @@ for filename in filenames:
     rc = RandomCrop(n_mels=128, time_steps=features_q.shape[-1], tcrop_ratio=0.9)
     resize = Resize(n_mels=128, time_steps=features_q.shape[-1])
     comp = Compander(comp_alpha=0.9)
-    awgn = GaussNoise(stdev_gen=0.01, device=args.device)
+    #awgn = GaussNoise(stdev_gen=0.01)
     makeview = nn.Sequential(rc, resize, comp)
 
     # Loading model
     encoder = ResNet()
     ckpt = torch.load(os.path.join(ckpt_dir, 'ckpt.pth'), map_location=torch.device('cpu'))
     encoder.load_state_dict(ckpt['encoder'], strict=False)
-    encoder = encoder.to(device)
+    encoder = encoder.to(args.device)
 
     # Preparing loader
     ds_pos = TensorDataset(features_pos)
@@ -218,7 +223,7 @@ for filename in filenames:
         if args.multiview:
             zp_views = []
             for i_v in range(args.nviews):
-                xp = x_p[0].to(device)
+                xp = x_p[0].to(args.device)
                 if i_v != 0:
                     xp = makeview(xp)
                 zp, _ = encoder(xp)
@@ -228,7 +233,7 @@ for filename in filenames:
             zp_mean = zp_views.mean(0).mean(0).unsqueeze(0)
             pos_feat = torch.cat((pos_feat, zp_mean), dim=0)
         else:  
-            z_pos, _ = encoder(x_p[0].to(device))
+            z_pos, _ = encoder(x_p[0].to(args.device))
             z_pos = z_pos.detach().cpu()
             z_pos_mean = z_pos.mean(dim=0).unsqueeze(0)
             pos_feat = torch.cat((pos_feat, z_pos_mean), dim=0)
@@ -241,7 +246,7 @@ for filename in filenames:
             zn_views = []
             z_feat = torch.zeros(0, emb_dim)
             for i_v in range(args.nviews):
-                xn = x_n[0].to(device)
+                xn = x_n[0].to(args.device)
                 if i_v != 0:
                     xn = makeview(xn)
                 zn, _ = encoder(xn)
@@ -251,7 +256,7 @@ for filename in filenames:
             zn_mean = zn_views.mean(0).mean(0).unsqueeze(0)
             neg_feat = torch.cat([neg_feat, zn_mean], dim=0)            
         else:  
-            z_neg, _ = encoder(x_n[0].to(device))
+            z_neg, _ = encoder(x_n[0].to(args.device))
             z_neg = z_neg.detach().cpu()
             z_neg_mean = z_neg.mean(dim=0).unsqueeze(0)
             neg_feat = torch.cat((neg_feat, z_neg_mean), dim=0)
@@ -263,7 +268,7 @@ for filename in filenames:
         if args.multiview:
             zq_views = []
             for i_v in range(args.nviews):
-                xq = x_q[0].to(device)
+                xq = x_q[0].to(args.device)
                 if i_v != 0:
                     xq = makeview(xq)
                 zq, _ = encoder(xq)
@@ -272,7 +277,7 @@ for filename in filenames:
             zq_views = torch.stack(zq_views)
             z_q = zq_views.mean(0)
         else:
-            z_q, _ = encoder(x_q[0].to(device))
+            z_q, _ = encoder(x_q[0].to(args.device))
             z_q = z_q.detach().cpu()
         distances = get_distance(pos_proto, neg_proto, z_q)
         label_pred = torch.argmax(distances, dim=-1)
@@ -313,4 +318,4 @@ for filename in filenames:
     offset_arr = np.append(offset_arr,offset)
 
 df_out = pd.DataFrame({'Audiofilename':name_arr,'Starttime':onset_arr,'Endtime':offset_arr})
-df_out.to_csv(csv_path,index=False)
+df_out.to_csv(csv_path, index=False)

@@ -66,7 +66,7 @@ def adjust_learning_rate(optimizer, init_lr, epoch, tot_epochs):
 if __name__ == "__main__":
 
     # Load data
-    hdf_tr = os.path.join(args.datapath, 'train.h5')
+    hdf_tr = os.path.join(args.traindir, 'train.h5')
     hdf_train = h5py.File(hdf_tr, 'r+')
     X = hdf_train['data'][:]
     Y = hdf_train['label'][:]
@@ -89,8 +89,7 @@ if __name__ == "__main__":
     transform2 = nn.Sequential(fshift, rc, resize, comp, awgn)
 
     # Prepare model
-    if args.model == 'resnet':
-        encoder = ResNet(method=args.method)
+    encoder = ResNet(method=args.method)
     print(summary(encoder))
 
     # Launch training

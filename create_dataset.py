@@ -7,7 +7,6 @@ import torch.nn as nn
 import numpy as np
 from torchaudio import transforms as T
 import h5py
-import argparse
 from args import args
 
 traindir = args.traindir
@@ -27,6 +26,7 @@ win_len = int(round((WIN_LEN/1000) * fps))
 seg_hop = int(round((SEG_LEN/1000) * fps))
 
 mel = T.MelSpectrogram(sample_rate=TARGET_SR, n_fft=N_FFT, hop_length=HOP_MEL, f_min=FMIN, f_max=FMAX, n_mels=N_MELS)
+
 power_to_db = T.AmplitudeToDB()
 transform = nn.Sequential(mel, power_to_db)
 
@@ -34,12 +34,14 @@ transform = nn.Sequential(mel, power_to_db)
 # class labels
 class_names = []
 ds_names = []
+
 for csv_file in csv_files:
     ds_name = csv_file.split('/')[-2]
 
     #wav_file = csv_file.replace('csv','wav')
     df = pd.read_csv(csv_file)
     col_names = df.columns.tolist()
+
     for col_name in col_names:
         if (col_name not in ['Audiofilename', 'Starttime', 'Endtime']) and (col_name not in class_names) and (len(df[df[col_name]=='POS'])>0):
             class_names.append(col_name)
@@ -51,7 +53,7 @@ for i in range(len(class_names)):
 def cls2int(cls_name):
     return map_cls_2_int[cls_name]
 
-hdf_tr = os.path.join(train_path,'train_'+str(args.nfft)+'_'+str(args.hoplen)+'_'+str(WIN_LEN)+'.h5')
+hdf_tr = os.path.join(traindir, 'train.h5')
 hf = h5py.File(hdf_tr,'w')
 hf.create_dataset('data', shape=(0, N_MELS, win_len), maxshape=(None, N_MELS, win_len))
 hf.create_dataset('label', shape=(0, 1), maxshape=(None, 1))

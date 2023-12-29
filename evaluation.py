@@ -1,4 +1,4 @@
-
+"""evaluation code from the challenge baseline : https://github.com/c4dm/dcase-few-shot-bioacoustic"""
 import pandas as pd
 import argparse
 import os
@@ -318,12 +318,12 @@ def evaluate(pred_file_path, ref_file_path, team_name, dataset, savepath, metada
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-pred_file', type=str, help='csv predictions file')
-    parser.add_argument('-ref_files_path', type=str, help='path to the ground truth csvs folder')
-    parser.add_argument('-metadata', type=str, help="path for metadata json. Participants may ignore this option.")
-    parser.add_argument('-team_name', type=str, help='team identification')
-    parser.add_argument('-dataset', type=str, help="which set to evaluate: EVAL or VAL")
-    parser.add_argument('-savepath', type=str, help="path where to save the report to")
+    parser.add_argument('--pred_file', type=str, help='csv predictions file')
+    parser.add_argument('--ref_files_path', type=str, help='path to the ground truth csvs folder')
+    parser.add_argument('--metadata', type=str, help="path for metadata json. Participants may ignore this option.")
+    parser.add_argument('--team_name', type=str, help='team identification')
+    parser.add_argument('--dataset', type=str, help="which set to evaluate: EVAL or VAL")
+    parser.add_argument('--savepath', type=str, help="path where to save the report to")
     args = parser.parse_args()
     # print(args)
 

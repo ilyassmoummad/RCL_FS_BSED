@@ -37,7 +37,7 @@ def mix_random(x):
     return alpha * x + (1. - alpha) * x[torch.randperm(x.shape[0]),...]
 
 class MixRandom(torch.nn.Module):
-    def __init__(self, device):
+    def __init__(self):
         super().__init__()
 
     def forward(self, x):
