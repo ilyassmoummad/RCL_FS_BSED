@@ -26,6 +26,7 @@ To get the scores:\
 ```evaluation.py``` : with arguments ```--pred_file``` for the predictions csv file created by the eval script (the file is in : traindir/../../outputs/eval.csv'), ```--ref_files``` for the path of validation datasets (same as ```--valdir```), and ```--save_path``` for the folder where to save the json file containing the scores
 
 If you any question or a problem with the code/results do not hesitate to mail me on : ilyass.moummad@imt-atlantique.fr or open an issue on this repository, I am very responsive.
+
 ---
 ### To cite our paper
 ```
