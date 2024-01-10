@@ -47,7 +47,7 @@ class SupConLoss(nn.Module): # Pretraining loss
         loss = - mean_log_prob_pos
         loss = loss.view(contrast_count, batch_size).mean()
         if self.use_tcr:
-            loss += args.alpha * ( self.tcr_fn(projection1) + self.tcr_fn(projection2) ) / 2  
+            loss += args.alpha * ( self.tcr_fn(projection1) + self.tcr_fn(projection2) ) / 2 
         return loss
 
 class TotalCodingRate(nn.Module): # Regularization for pretraining loss
@@ -71,7 +71,6 @@ class ProtoCLR(nn.Module): #Finetuning loss
     def __init__(self, tau=1.):
         super(ProtoCLR, self).__init__()
         self.tau = tau
-        self.tcr_fn = TotalCodingRate(eps=args.eps)
 
     def forward(self, z1_features, z2_features, labels):
 

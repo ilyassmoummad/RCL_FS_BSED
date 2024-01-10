@@ -1,20 +1,21 @@
 import torch
+from torch.nn import functional as F
 from losses import ProtoCLR
 from train import adjust_learning_rate
 from tqdm import tqdm
 
-def get_distance(proto_pos,neg_proto,query_set_out):
+def get_distance(proto_pos, neg_proto, query_set_out):
 
-    prototypes = torch.stack([proto_pos,neg_proto]).squeeze(1)
+    prototypes = torch.stack([proto_pos, neg_proto]).squeeze(1)
     dists = torch.cdist(query_set_out, prototypes)
-    return dists.cpu()
+    return dists
 
 
 def finetune_proto(encoder, train_loader, transform,  args):
 
     print(f"Finetuning on {args.device}")
     
-    loss_fn = ProtoCLR() # tau=1.0 by default
+    loss_fn = ProtoCLR(tau=1.0)
     
     non_trainable_parameters = []
     
@@ -33,8 +34,6 @@ def finetune_proto(encoder, train_loader, transform,  args):
     
     num_epochs = args.ftepochs
 
-    # train_loss = []
-    # best_loss = None
     encoder = encoder.to(args.device)
     encoder.train()
 
@@ -65,7 +64,5 @@ def finetune_proto(encoder, train_loader, transform,  args):
                 
         tr_loss = tr_loss/len(train_iterator)
         print('Average train loss: {}'.format(tr_loss))
-        # if args.adam:
-        #     lr_scheduler.step()
 
     return encoder

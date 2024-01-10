@@ -36,11 +36,6 @@ mel = T.MelSpectrogram(sample_rate=args.sr, n_fft=args.nfft, hop_length=args.hop
 power_to_db = T.AmplitudeToDB()
 transform = nn.Sequential(mel, power_to_db)
 
-report = {}
-report['filename'] = []
-report['onset'] = []
-report['offset'] = []
-report['preds'] = []
 name_arr = np.array([])
 onset_arr = np.array([])
 offset_arr = np.array([])
@@ -189,7 +184,6 @@ for filename in filenames:
     rc = RandomCrop(n_mels=128, time_steps=features_q.shape[-1], tcrop_ratio=0.9)
     resize = Resize(n_mels=128, time_steps=features_q.shape[-1])
     comp = Compander(comp_alpha=0.9)
-    awgn = GaussNoise(stdev_gen=0.01)
     makeview = nn.Sequential(rc, resize, comp)
 
     # Loading model
@@ -304,14 +298,10 @@ for filename in filenames:
     offset = offset + str_time_query
 
     assert len(onset) == len(offset)
-    report['filename'].append(filename)
-    report['onset'].append(onset)
-    report['offset'].append(offset)
-    report['preds'].append(labs_pred)
     name = np.repeat(audio_name,len(onset))
     name_arr = np.append(name_arr,name)
     onset_arr = np.append(onset_arr,onset)
     offset_arr = np.append(offset_arr,offset)
 
-df_out = pd.DataFrame({'Audiofilename':name_arr,'Starttime':onset_arr,'Endtime':offset_arr})
+df_out = pd.DataFrame({'Audiofilename': name_arr,'Starttime': onset_arr,'Endtime': offset_arr})
 df_out.to_csv(csv_path, index=False)

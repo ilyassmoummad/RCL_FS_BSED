@@ -7,7 +7,6 @@ import random
 
 def random_freq_shift(_spec, Fshift):
 
-    n_frames = _spec.shape[-1]
     n_bands = _spec.shape[-2]
 
     deltaf = int(np.random.uniform(low=0.0, high=Fshift))

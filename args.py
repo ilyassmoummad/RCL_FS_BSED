@@ -7,13 +7,13 @@ parser.add_argument("--device", type=str, default='cuda:0') #device to train on
 parser.add_argument("--workers", type=int, default=4) #number of workers
 
 # data path
-parser.add_argument("--traindir", type=str, default='/users/local/i21moumm/dcase23/Development_Set/Training_Set') #root dir for the training dataset
-parser.add_argument("--valdir", type=str, default='/users/local/i21moumm/dcase23/Development_Set/Validation_Set') #root dir for the training dataset
+parser.add_argument("--traindir", type=str, default='Development_Set/Training_Set') #root dir for the training dataset
+parser.add_argument("--valdir", type=str, default='Development_Set/Validation_Set') #root dir for the validation dataset
 
 # training
 parser.add_argument("--method", type=str, default='scl') #whether to use labels or not for training representations ['scl', 'ssl']
-parser.add_argument("--bs", type=int, default=128) #batch size for representation learning
-parser.add_argument("--qbs", type=int, default=16) #batch size for query prediction
+parser.add_argument("--bs", type=int, default=128) #batch size for representation learning (training stage)
+parser.add_argument("--qbs", type=int, default=16) #batch size for query prediction (inference stage)
 parser.add_argument("--wd", type=float, default=1e-4) #weight decay
 parser.add_argument("--momentum", type=float, default=0.9) #sgd momentum
 parser.add_argument("--lr", type=float, default=1e-2) #learning rate 
@@ -51,6 +51,6 @@ parser.add_argument("--ftepochs", type=int, default=40) #nb of epochs to finetun
 # loss hyperparams
 parser.add_argument("--tau", type=float, default=0.06) #temperature for SupCon
 parser.add_argument("--eps", type=float, default=0.05) #epsilon² of TCR regularization
-parser.add_argument("--alpha", type=float, default=1e-4) #loss coef for TCR regularization
+parser.add_argument("--alpha", type=float, default=1e-3) #loss coef for TCR regularization
 
 args = parser.parse_args()
