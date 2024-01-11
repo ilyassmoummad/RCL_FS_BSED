@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torchaudio
 from torchaudio import transforms as T
-from train import ResNet
+from models import ResNet
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -10,7 +10,6 @@ from torch.utils.data import TensorDataset, DataLoader
 from util import get_distance
 import glob
 import os
-import pickle
 from augmentations import RandomCrop, Resize, GaussNoise, Compander, FreqShift
 from evaluation import evaluate
 from args import args
