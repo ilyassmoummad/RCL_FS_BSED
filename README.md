@@ -8,7 +8,7 @@ We improve over our previous [work](https://github.com/ilyassmoummad/dcase23_tas
 ```args.py```: contains default values for arguments
 
 ## Data
-Download the dataset from Zenodo: https://zenodo.org/records/6482837\
+Download the dataset from Zenodo: https://zenodo.org/records/6482837
 To create the spectrograms of the training set:\
 ```create_train.py```: with argument ```--traindir``` for the folder containing the training datasets
 
